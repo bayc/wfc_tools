@@ -1,0 +1,3 @@
+
+class FlorisInterface(GenericInterface):
+    pass
