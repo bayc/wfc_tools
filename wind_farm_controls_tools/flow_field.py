@@ -17,7 +17,7 @@ import pandas as pd
 from floris.coordinate import Coordinate
 
 class FlowField():
-    def __init__(self, x, y, z, u, v, w, layout, diameter, hub_height):
+    def __init__(self, x, y, z, u, v, w):#, layout, diameter, hub_height):
         """
         x, y, z, u, v, w are numpy arrays
         """
@@ -27,7 +27,7 @@ class FlowField():
         self.u = u
         self.v = v
         self.w = w
-        self.layout = layout
-        self.diameter = diameter
-        self.hub_height = hub_height
+        # self.layout = layout
+        # self.diameter = diameter
+        # self.hub_height = hub_height
         self.grid_resolution = Coordinate(100, 100, 100)

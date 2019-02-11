@@ -10,3 +10,4 @@ floris_flow_field_a = floris_interface_a.get_flow_field()
 # visualization
 vm = VisualizationManager()
 vm.plot_x_planes(floris_flow_field_a, [0.5])
+vm.show()

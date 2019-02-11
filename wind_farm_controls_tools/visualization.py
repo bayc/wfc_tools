@@ -132,9 +132,10 @@ class VisualizationManager():
             a list of plane locations to plot
         """
         for p in planes:
-            self._add_x_plane(p, **kwargs)
+            self._add_x_plane(flow_field, p, **kwargs)
 
-
+    def show(self):
+        plt.show()
 
     # def _map_coordinate_to_index(self, coord):
     #     xi = max(0, int(self.grid_resolution.x * (coord.x - self.xmin - 1) \

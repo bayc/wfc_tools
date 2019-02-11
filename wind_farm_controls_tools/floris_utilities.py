@@ -29,7 +29,7 @@ class FlorisInterface(GenericInterface):
         self.input_file = input_file
         self.floris = Floris(input_file=input_file)
         
-        super().__init__(self)
+        super().__init__()
 
     def run_floris(self):
         self.floris.farm.flow_field.calculate_wake()
@@ -45,11 +45,17 @@ class FlorisInterface(GenericInterface):
         if resolution is not None:
             # TODO: flow_field.redo_resolution()
             pass
-        x = flow_field.x.flatten()
-        y = flow_field.y.flatten()
-        z = flow_field.z.flatten()
-        u = flow_field.u_field.flatten()
-        if hasattr(flow_field, 'v'):
-            v = flow_field.v.flatten()
-            w = flow_field.w.flatten()
+
+        x = flow_field.x
+        y = flow_field.y
+        z = flow_field.z
+
+        if hasattr(flow_field, 'u'):
+            u = flow_field.u
+        elif hasattr(flow_field, 'u_field'):
+            u = flow_field.u_field
+        else:
+            None
+        v = flow_field.v if hasattr(flow_field, 'v') else None
+        w = flow_field.w if hasattr(flow_field, 'w') else None
         return FlowField(x, y, z, u, v, w)
