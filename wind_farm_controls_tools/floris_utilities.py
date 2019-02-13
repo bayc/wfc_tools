@@ -40,18 +40,19 @@ class FlorisInterface(GenericInterface):
             # TODO: flow_field.redo_resolution()
             pass
 
-        x = flow_field.x.flatten()
-        y = flow_field.y.flatten()
-        z = flow_field.z.flatten()
+        order = "f"
+        x = flow_field.x.flatten(order=order)
+        y = flow_field.y.flatten(order=order)
+        z = flow_field.z.flatten(order=order)
 
         if hasattr(flow_field, 'u'):
-            u = flow_field.u.flatten()
+            u = flow_field.u.flatten(order=order)
         elif hasattr(flow_field, 'u_field'):
-            u = flow_field.u_field.flatten()
+            u = flow_field.u_field.flatten(order=order)
         else:
             None
-        v = flow_field.v.flatten() if hasattr(flow_field, 'v') else None
-        w = flow_field.w.flatten() if hasattr(flow_field, 'w') else None
+        v = flow_field.v.flatten(order=order) if hasattr(flow_field, 'v') else None
+        w = flow_field.w.flatten(order=order) if hasattr(flow_field, 'w') else None
 
         # Determine spacing, dimensions and origin
         unique_x = np.sort(np.unique(x))

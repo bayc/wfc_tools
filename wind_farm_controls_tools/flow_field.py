@@ -46,7 +46,7 @@ class FlowField():
             out.write('DATASET STRUCTURED_POINTS\n')
             out.write('DIMENSIONS %d %d %d\n' % self.dimensions)
             out.write('ORIGIN %.3f %.3f %.3f \n' % self.origin)
-            out.write('SPACING %d %d %d\n' % self.spacing)
+            out.write('SPACING %f %f %f\n' % self.spacing)
             out.write('POINT_DATA %d\n' % np.product(self.dimensions))
             out.write('FIELD attributes 1\n')
             out.write('UAvg 3 %d float\n' % np.product(self.dimensions))
