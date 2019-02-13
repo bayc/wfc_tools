@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 from floris.coordinate import Coordinate
 
+
 class FlowField():
     #TODO handle none case, maybe defaul values apply like 0 origin and auto determine spacing and dimensions
     def __init__(self, x, y, z, u, v, w, spacing=None, dimensions=None, origin=None):
@@ -33,43 +34,6 @@ class FlowField():
         self.dimensions = dimensions
         self.origin = origin
 
-
-    def crop(self,x_bnds,y_bnds,z_bnds):
-        """
-        Return a croped version of the flow field
-        """
-
-        map_values = (self.x > x_bnds[0]) & (self.x < x_bnds[1]) & (self.y > y_bnds[0]) & (self.y < y_bnds[1]) & (self.z > z_bnds[0]) & (self.z < z_bnds[1])
-
-        x = self.x[map_values]
-        y = self.y[map_values]
-        z = self.z[map_values]
- 
-        #  Work out new dimensions
-        dimensions = (len(np.unique(x)),len(np.unique(y)),len(np.unique(z)))
-  
-        # Work out origin
-        origin = (
-            self.origin[0]+np.min(x),
-            self.origin[1]+np.min(y),
-            self.origin[2]+np.min(z),
-        )
-
-        flow_field_return = FlowField(
-            x-np.min(x),
-            y-np.min(y),
-            z-np.min(z),
-            self.u[map_values],
-            self.v[map_values],
-            self.w[map_values],
-            spacing = self.spacing, # doesn't change
-            dimensions = dimensions,
-            origin = origin
-        )
-        print(np.unique(flow_field_return.z))
-        print(np.unique(flow_field_return.z))
-        return  flow_field_return
-
     def save_as_vtk(self, filename):
 
         # Open the file
@@ -83,11 +47,45 @@ class FlowField():
             out.write('DIMENSIONS %d %d %d\n' % self.dimensions)
             out.write('ORIGIN %.3f %.3f %.3f \n' % self.origin)
             out.write('SPACING %d %d %d\n' % self.spacing)
-            out.write('POINT_DATA %d\n' %  np.product(self.dimensions))
+            out.write('POINT_DATA %d\n' % np.product(self.dimensions))
             out.write('FIELD attributes 1\n')
-            out.write('UAvg 3 %d float\n' %  np.product(self.dimensions))
+            out.write('UAvg 3 %d float\n' % np.product(self.dimensions))
 
             # Put out the data
-            for u,v,w in zip(self.u,self.v,self.w):
-                out.write('%f\t%f\t%f\n' % (u,v,w))
+            for u, v, w in zip(self.u, self.v, self.w):
+                out.write('%f\t%f\t%f\n' % (u, v, w))
 
+    @staticmethod
+    def crop(ff, x_bnds, y_bnds, z_bnds):
+        """
+        Return a croped version of the flow field
+        """
+
+        map_values = (ff.x > x_bnds[0]) & (ff.x < x_bnds[1]) & (ff.y > y_bnds[0]) & (
+            ff.y < y_bnds[1]) & (ff.z > z_bnds[0]) & (ff.z < z_bnds[1])
+
+        x = ff.x[map_values]
+        y = ff.y[map_values]
+        z = ff.z[map_values]
+
+        #  Work out new dimensions
+        dimensions = (len(np.unique(x)), len(np.unique(y)), len(np.unique(z)))
+
+        # Work out origin
+        origin = (
+            ff.origin[0]+np.min(x),
+            ff.origin[1]+np.min(y),
+            ff.origin[2]+np.min(z),
+        )
+
+        return FlowField(
+            x-np.min(x),
+            y-np.min(y),
+            z-np.min(z),
+            ff.u[map_values],
+            ff.v[map_values],
+            ff.w[map_values],
+            spacing=ff.spacing,  # doesn't change
+            dimensions=dimensions,
+            origin=origin
+        )
