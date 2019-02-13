@@ -17,7 +17,7 @@ from .generic_simulation import GenericInterface
 from floris.floris import Floris
 from .flow_field import FlowField
 
-# Performance Analysis Uncertainty Library And FLow EstiMation plottING: PAUL A FLEMING
+
 
 
 class FlorisInterface(GenericInterface):
@@ -28,18 +28,15 @@ class FlorisInterface(GenericInterface):
     def __init__(self, input_file):
         self.input_file = input_file
         self.floris = Floris(input_file=input_file)
+        flow_field = self.get_flow_field()
         
-        super().__init__()
+        super().__init__(flow_field)
 
     def run_floris(self):
         self.floris.farm.flow_field.calculate_wake()
 
     def get_flow_field(self, resolution=None):
-        """
-        df: a pandas table with the columns, x,y,z,u,v,w of all relevant flow info
-            origin: the origin of the flow field, for reconstructing turbine coords
-        Paul Fleming, 2018
-        """
+
 
         flow_field = self.floris.farm.flow_field
         if resolution is not None:
@@ -58,4 +55,12 @@ class FlorisInterface(GenericInterface):
             None
         v = flow_field.v if hasattr(flow_field, 'v') else None
         w = flow_field.w if hasattr(flow_field, 'w') else None
-        return FlowField(x, y, z, u, v, w)
+
+        # Determine spacing, dimensions and origin
+        unique_x = np.sort(np.unique(x))
+        unique_y = np.sort(np.unique(y))
+        unique_z = np.sort(np.unique(z))
+        spacing = (unique_x[1]-unique_x[0],unique_y[1]-unique_y[0],unique_z[1]-unique_z[0] )
+        dimensions = (len(unique_x),len(unique_y),len(unique_z))
+        origin =(0,0,0)
+        return FlowField(x, y, z, u, v, w,spacing=spacing,dimensions=dimensions,origin=origin)

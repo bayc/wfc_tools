@@ -11,6 +11,8 @@
 # specific language governing permissions and limitations under the License.
 #
 
+# from .flow_field import FlowField
+
 class GenericInterface():
     """
     - cutplane
@@ -19,19 +21,9 @@ class GenericInterface():
     - averaging window
     """
 
-    def __init__(self):
+    def __init__(self, flow_field):
+        
         # private variables
-        self._flow_field = None
+        self._flow_field = flow_field
         # self.wind_speed = wind_speed
 
-    # def flowfield(self):
-    #     """
-    #     flowfield should be in this format:
-    #     DataFrame: {
-    #         u: np.array()
-    #         v: np.array()
-    #         w: np.array()
-    #     }
-    #     """
-    #     return
-    
