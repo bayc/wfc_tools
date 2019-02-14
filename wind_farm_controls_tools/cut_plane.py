@@ -11,7 +11,6 @@
 # specific language governing permissions and limitations under the License.
 #
 
-from .flow_field import FlowField
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
