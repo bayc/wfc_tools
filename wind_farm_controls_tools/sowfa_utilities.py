@@ -98,7 +98,7 @@ class SowfaInterface(GenericInterface):
 
 
 
-    def describe(self):
+    def __str__(self):
 
         print('---------------------')
         print('Case: %s' % self.case_folder)
@@ -115,6 +115,7 @@ class SowfaInterface(GenericInterface):
         print('Settling time: %.1fs' % self.settling_time)
         print('Simulation time: %.1fs' % self.sim_time_length)
         print('---------------------')
+        return ' '
 
 
 

@@ -28,4 +28,5 @@ plot_turbines(ax, sowfa_case.layout_x, sowfa_case.layout_y, sowfa_case.yaw_angle
 plt.show()
 
 # Describe self
-sowfa_case.describe()
+# sowfa_case.describe()
+print(sowfa_case)
