@@ -79,3 +79,19 @@ class Vec3():
         return self.x1 == arg.x1 \
             and self.x2 == arg.x2 \
             and self.x3 == arg.x3
+
+
+class Output():
+    def __init__(self, filename):
+        self.filename = filename
+        self.file = open(self.filename, "w")
+        self.ln = "\n"
+
+    def write_empty_line(self):
+        self.write_line("")
+
+    def write_line(self, line):
+        self.file.write(line + self.ln)
+
+    def end(self):
+        self.file.close()
