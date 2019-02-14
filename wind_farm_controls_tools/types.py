@@ -11,15 +11,29 @@
 # specific language governing permissions and limitations under the License.
 #
 
+import numpy as np
+
 
 class Vec3():
-    def __init__(self, x1, x2, x3):
-        self.x1 = float(x1)
-        self.x2 = float(x2)
-        self.x3 = float(x3)
+    def __init__(self, x1, x2, x3, string_format=None):
+        self.x1 = x1
+        self.x2 = x2
+        self.x3 = x3
+
+        # TODO: checks:
+        # - x1, x2, x3 are all of the same type
+
+        if string_format is not None:
+            self.string_format = string_format
+        else:
+            if type(self.x1) in [int]:
+                self.string_format = "{:8d}"
+            elif type(self.x1) in [float, np.float64]:
+                self.string_format = "{:8.5f}"
 
     def __str__(self):
-        return "<{:8.3f},{:8.3f},{:8.3f}>".format(self.x1, self.x2, self.x3)
+        template_string = "{} {} {}".format(self.string_format, self.string_format, self.string_format)
+        return template_string.format(self.x1, self.x2, self.x3)
 
     def __add__(self, arg):
         if type(arg) is Vec3:
