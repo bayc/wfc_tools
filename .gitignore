@@ -106,3 +106,4 @@ ENV/
 
 # DS STORE
 *DS_STORE*
+*DS_Store*
