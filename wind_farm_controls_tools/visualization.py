@@ -13,6 +13,17 @@ from floris.coordinate import Coordinate
 import matplotlib.pyplot as plt
 import numpy as np
 
+def plot_turbines(ax, layout_x, layout_y, yaw_angles, D):
+
+    for x, y, yaw in zip(layout_x,layout_y,yaw_angles):
+        R = D/2.
+        x_0 = x + np.sin(np.deg2rad(yaw)) * R
+        x_1 = x - np.sin(np.deg2rad(yaw)) * R
+        y_0 = y - np.cos(np.deg2rad(yaw)) * R
+        y_1 = y + np.cos(np.deg2rad(yaw)) * R
+        ax.plot([x_0,x_1],[y_0,y_1],color='k')
+
+
 class VisualizationManager():
     """
     The VisualizationManager handles all of the lower level visualization instantiation
