@@ -16,7 +16,7 @@ import numpy as np
 from .generic_simulation import GenericInterface
 from floris.floris import Floris
 from .flow_field import FlowField
-
+from .types import Vec3
 
 class FlorisInterface(GenericInterface):
     """
@@ -58,8 +58,8 @@ class FlorisInterface(GenericInterface):
         unique_x = np.sort(np.unique(x))
         unique_y = np.sort(np.unique(y))
         unique_z = np.sort(np.unique(z))
-        spacing = (unique_x[1]-unique_x[0], unique_y[1] -
+        spacing = Vec3(unique_x[1]-unique_x[0], unique_y[1] -
                    unique_y[0], unique_z[1]-unique_z[0])
-        dimensions = (len(unique_x), len(unique_y), len(unique_z))
-        origin = (0, 0, 0)
+        dimensions = Vec3(len(unique_x), len(unique_y), len(unique_z))
+        origin = Vec3(0.0, 0.0, 0.0)
         return FlowField(x, y, z, u, v, w, spacing=spacing, dimensions=dimensions, origin=origin)

@@ -15,7 +15,8 @@ import os
 import numpy as np
 import pandas as pd
 from floris.coordinate import Coordinate
-
+from .types import Output
+from .types import Vec3
 
 class FlowField():
     #TODO handle none case, maybe defaul values apply like 0 origin and auto determine spacing and dimensions
@@ -35,25 +36,20 @@ class FlowField():
         self.origin = origin
 
     def save_as_vtk(self, filename):
-
-        # Open the file
-        with open(filename, 'w') as out:
-
-            # Write the header
-            out.write('# vtk DataFile Version 3.0\n')
-            out.write('array.mean0D\n')
-            out.write('ASCII\n')
-            out.write('DATASET STRUCTURED_POINTS\n')
-            out.write('DIMENSIONS %d %d %d\n' % self.dimensions)
-            out.write('ORIGIN %.3f %.3f %.3f \n' % self.origin)
-            out.write('SPACING %f %f %f\n' % self.spacing)
-            out.write('POINT_DATA %d\n' % np.product(self.dimensions))
-            out.write('FIELD attributes 1\n')
-            out.write('UAvg 3 %d float\n' % np.product(self.dimensions))
-
-            # Put out the data
-            for u, v, w in zip(self.u, self.v, self.w):
-                out.write('%f\t%f\t%f\n' % (u, v, w))
+        n_points = self.dimensions.x1 * self.dimensions.x2 * self.dimensions.x3
+        vtk_file = Output(filename)
+        vtk_file.write_line('# vtk DataFile Version 3.0')
+        vtk_file.write_line('array.mean0D')
+        vtk_file.write_line('ASCII')
+        vtk_file.write_line('DATASET STRUCTURED_POINTS')
+        vtk_file.write_line('DIMENSIONS {}'.format(self.dimensions))
+        vtk_file.write_line('ORIGIN {}'.format(self.origin))
+        vtk_file.write_line('SPACING {}'.format(self.spacing))
+        vtk_file.write_line('POINT_DATA {}' .format(n_points))
+        vtk_file.write_line('FIELD attributes 1')
+        vtk_file.write_line('UAvg 3 {} float'.format(n_points))
+        for u, v, w in zip(self.u, self.v, self.w):
+            vtk_file.write_line('{}'.format(Vec3(u, v, w)))
 
     @staticmethod
     def crop(ff, x_bnds, y_bnds, z_bnds):
