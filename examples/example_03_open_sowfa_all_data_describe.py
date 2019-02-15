@@ -1,32 +1,32 @@
+#
+# Copyright 2019 NREL
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+# this file except in compliance with the License. You may obtain a copy of the
+# License at http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed
+# under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+# CONDITIONS OF ANY KIND, either express or implied. See the License for the
+# specific language governing permissions and limitations under the License.
+#
+
 # EXAMPLE 3
 # In this example, open a SOWFA case including all meta-data
 # Show the data
 # PLot the flow with turbine positions indicated
 
-
-# DOES NOT WORK?
-# import wind_farm_controls_tools as wfct #Why doesn't this way work?
-# sowfa_case = wfct.sowfa_utilities.SowfaInterface('sowfa_example')
-
-# This seems to work:
-#TODO Super ugly though get to an "as" type import
-from wind_farm_controls_tools.sowfa_utilities import SowfaInterface
-from wind_farm_controls_tools.visualization import plot_turbines
-from wind_farm_controls_tools.cut_plane import HorPlane
+import wind_farm_controls_tools as wfct
 import matplotlib.pyplot as plt
 
-# Load the sowfa case in
-sowfa_case = SowfaInterface('sowfa_example')
+# Load the sowfa case
+sowfa_case = wfct.sowfa_utilities.SowfaInterface('sowfa_example')
+print(sowfa_case)
 
 # Plot the flow and turbines using the input information
 fig, ax = plt.subplots()
 flow_field = sowfa_case._flow_field
-hor_plane = HorPlane(flow_field,90)
+hor_plane = wfct.cut_plane.HorPlane(flow_field, 90)
 hor_plane.visualize(ax=ax)
-plot_turbines(ax, sowfa_case.layout_x, sowfa_case.layout_y, sowfa_case.yaw_angles, sowfa_case.D)
-
+wfct.visualization.plot_turbines(ax, sowfa_case.layout_x, sowfa_case.layout_y, sowfa_case.yaw_angles, sowfa_case.D)
 plt.show()
-
-# Describe self
-# sowfa_case.describe()
-print(sowfa_case)

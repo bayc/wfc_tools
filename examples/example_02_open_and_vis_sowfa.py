@@ -1,19 +1,22 @@
-# DOES NOT WORK?
-# import wind_farm_controls_tools as wfct #Why doesn't this way work?
-# sowfa_case = wfct.sowfa_utilities.SowfaInterface('sowfa_example')
-
-# This seems to work:
-#TODO Super ugly though get to an "as" type import
-from wind_farm_controls_tools.sowfa_utilities import SowfaInterface
-from wind_farm_controls_tools.cut_plane import HorPlane
+#
+# Copyright 2019 NREL
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+# this file except in compliance with the License. You may obtain a copy of the
+# License at http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed
+# under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+# CONDITIONS OF ANY KIND, either express or implied. See the License for the
+# specific language governing permissions and limitations under the License.
+#
 
 import matplotlib.pyplot as plt
+import wind_farm_controls_tools as wfct
 
-sowfa_case = SowfaInterface('sowfa_example')
+sowfa_case = wfct.sowfa_utilities.SowfaInterface('sowfa_example')
 
 # Show the original horizontal plane
-flow_field = sowfa_case._flow_field
-hor_plane = HorPlane(flow_field,90)
+hor_plane = wfct.cut_plane.HorPlane(sowfa_case._flow_field, 90)
 hor_plane.visualize()
-
 plt.show()
