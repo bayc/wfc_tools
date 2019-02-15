@@ -14,7 +14,7 @@
 # EXAMPLE 3
 # In this example, open a SOWFA case including all meta-data
 # Show the data
-# PLot the flow with turbine positions indicated
+# Plot the flow with turbine positions indicated
 
 import wind_farm_controls_tools as wfct
 import matplotlib.pyplot as plt
