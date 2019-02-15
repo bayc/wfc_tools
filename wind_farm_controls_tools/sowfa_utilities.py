@@ -50,8 +50,8 @@ class SowfaInterface(GenericInterface):
         flow_field = self.read_flow_frame_SOWFA(os.path.join(case_folder, flow_field_sub_path))
 
         # Re-set turbine positions to flow_field origin
-        self.layout_x = self.layout_x - flow_field.origin[0]
-        self.layout_y = self.layout_y - flow_field.origin[1]
+        self.layout_x = self.layout_x - flow_field.origin.x1
+        self.layout_y = self.layout_y - flow_field.origin.x2
         #TODO HUB-HEIGHT reset with z??
 
         super().__init__(flow_field)
@@ -149,12 +149,12 @@ class SowfaInterface(GenericInterface):
             xRange = np.array([0.0])
 
         if dimensions.x2 > 1.0:
-            yRange = np.arange(0, dimensions.x1*spacing.x1, spacing.x1)
+            yRange = np.arange(0, dimensions.x2*spacing.x2, spacing.x2)
         else:
             yRange = np.array([0.0])
 
         if dimensions.x3 > 1.0:
-            zRange = np.arange(0, dimensions.x2*spacing.x2, spacing.x2)
+            zRange = np.arange(0, dimensions.x3*spacing.x3, spacing.x3)
         else:
             zRange = np.array([0.0])
 
