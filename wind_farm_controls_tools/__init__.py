@@ -13,6 +13,7 @@ from . import flow_field
 from . import generic_simulation
 from . import optimization
 from . import sowfa_utilities
+from . import types
 from . import visualization
 from . import wind_rose
 
