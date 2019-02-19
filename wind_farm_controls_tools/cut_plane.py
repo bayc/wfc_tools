@@ -190,10 +190,22 @@ class CrossPlane(_CutPlane):
         # Return the mean wind speed
         return np.cbrt(np.mean(self.u_cubed[distance < R]))
 
-    def get_profile(self, resolution=10, x1_locs=None):
+    def get_profile(self, resolution=100, x1_locs=None):
         if x1_locs is None:
             x1_locs = np.linspace(
                 min(self.x1_flat), max(self.x1_flat), resolution)
         v_array = np.array([self.calculate_wind_speed(
             x1_loc, self.x2_center, self.D/2.) for x1_loc in x1_locs])
         return ((x1_locs - self.x1_center)/self.D, v_array)
+
+    def get_power_profile(self, ws_array, cp_array, rotor_radius, air_density=1.225, resolution=100, x1_locs=None):
+
+        # Get the wind speed profile
+        x1_locs, v_array = self.get_profile(resolution=resolution, x1_locs=x1_locs)
+
+        # Get Cp
+        cp_array = np.interp(v_array,ws_array,cp_array)
+
+        # Return power array
+        return x1_locs, 0.5 * air_density * (np.pi * rotor_radius**2) * cp_array * v_array**3
+
