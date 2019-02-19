@@ -86,6 +86,9 @@ class SowfaInterface(GenericInterface):
         self.settling_time = averagine_start_time - start_run_time
         self.precursor_wind_speed = setup_dict['U0Mag']
 
+        # Get the wind direction
+        self.precursor_wind_dir = setup_dict['dir']
+
         # print(turbine_array_dict['baseLocation'])
 
         # Read the outputs
@@ -110,6 +113,7 @@ class SowfaInterface(GenericInterface):
         print('Pitch Angels, ', self.pitch_angles)
         print('==Inflow Info==')
         print('U0Mag: %.2fm/s' % self.precursor_wind_speed)
+        print('dir: %.1f' % self.precursor_wind_dir)
         print('==Timing Info==')
         print('Settling time: %.1fs' % self.settling_time)
         print('Simulation time: %.1fs' % self.sim_time_length)

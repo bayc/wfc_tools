@@ -69,9 +69,9 @@ class FlowField():
 
         # Work out origin
         origin = (
-            ff.origin[0]+np.min(x),
-            ff.origin[1]+np.min(y),
-            ff.origin[2]+np.min(z),
+            ff.origin.x1+np.min(x),
+            ff.origin.x2+np.min(y),
+            ff.origin.x3+np.min(z),
         )
 
         return FlowField(
