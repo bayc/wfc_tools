@@ -44,14 +44,14 @@ class _CutPlane():
               (self.x3_name, x3_value, nearest_value))
 
         # Select down the data
-        x3_select_map = x3_array == nearest_value
+        x3_select_mask = x3_array == nearest_value
 
         # Store the un-interpolated input arrays at this slice 
-        self.x1_in = x1_array[x3_select_map]
-        self.x2_in = x2_array[x3_select_map]
-        self.u_in = flow_field.u[x3_select_map]
-        self.v_in = flow_field.v[x3_select_map]
-        self.w_in = flow_field.w[x3_select_map]
+        self.x1_in = x1_array[x3_select_mask]
+        self.x2_in = x2_array[x3_select_mask]
+        self.u_in = flow_field.u[x3_select_mask]
+        self.v_in = flow_field.v[x3_select_mask]
+        self.w_in = flow_field.w[x3_select_mask]
 
         # Initially, x1_lin, x2_lin are unique values of input
         self.x1_lin = np.unique(self.x1_in)
