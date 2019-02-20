@@ -13,7 +13,6 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
 from scipy.interpolate import griddata
 
 
@@ -66,7 +65,7 @@ class _CutPlane():
 
 
     def _remesh(self):
-        
+
         # Mesh and interpolate u, v and w
         self.x1_mesh, self.x2_mesh = np.meshgrid(self.x1_lin, self.x2_lin)
         self.u_mesh = griddata(np.column_stack([self.x1_in, self.x2_in]), self.u_in, (
