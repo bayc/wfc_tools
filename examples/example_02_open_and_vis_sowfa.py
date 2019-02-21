@@ -13,10 +13,53 @@
 
 import matplotlib.pyplot as plt
 import wind_farm_controls_tools as wfct
+import numpy as np
 
 sowfa_case = wfct.sowfa_utilities.SowfaInterface('sowfa_example')
 
-# Show the original horizontal plane
+# Get the horizontal cut plane
 hor_plane = wfct.cut_plane.HorPlane(sowfa_case._flow_field, 90)
-hor_plane.visualize()
+
+# Show the views in different permutations
+fig,axarr = plt.subplots(3,2,figsize=(10,10))
+
+# Original
+ax = axarr[0,0]
+hor_plane.visualize(ax=ax)
+ax.set_title('Original')
+
+# Set turbine location as 0,0
+hor_plane = wfct.cut_plane.set_origin(hor_plane,250.,200.)
+ax = axarr[1,0]
+hor_plane.visualize(ax=ax)
+ax.set_title('Turbine at origin')
+
+# Increase the resolution
+hor_plane = wfct.cut_plane.change_resolution(hor_plane,resolution=(2000,2000))
+ax = axarr[2,0]
+hor_plane.visualize(ax=ax)
+ax.set_title('Increased Resolution')
+
+# # Interpolate onto new array
+x1_array = np.linspace(-50,300)
+x2_array = np.linspace(-100,100)
+hor_plane = wfct.cut_plane.interpolate_onto_array(hor_plane,x1_array,x2_array)
+ax = axarr[0,1]
+hor_plane.visualize(ax=ax)
+ax.set_title('Provided Grid')
+
+# Express axis in terms of D
+D = 126. # m
+hor_plane = wfct.cut_plane.rescale_axis(hor_plane, x1_factor=D,x2_factor=D)
+ax = axarr[1,1]
+hor_plane.visualize(ax=ax)
+ax.set_title('Axis in D')
+
+# Invert x1
+hor_plane = wfct.cut_plane.rescale_axis(hor_plane, x1_factor=-1.)
+ax = axarr[2,1]
+hor_plane.visualize(ax=ax)
+ax.set_title('Invert x1')
+
+
 plt.show()
