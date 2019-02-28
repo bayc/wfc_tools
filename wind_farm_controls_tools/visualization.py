@@ -9,7 +9,7 @@
 # CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
 
-from floris.coordinate import Coordinate
+from .types import Vec3
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -81,8 +81,8 @@ class VisualizationManager():
 
     # FLORIS-specific data manipulation and plotting
     def _add_turbine_marker(self, turbine, coords, wind_direction):
-        a = Coordinate(coords.x, coords.y - turbine.rotor_radius)
-        b = Coordinate(coords.x, coords.y + turbine.rotor_radius)
+        a = Vec3(coords.x, coords.y - turbine.rotor_radius)
+        b = Vec3(coords.x, coords.y + turbine.rotor_radius)
         a.rotate_z(turbine.yaw_angle - wind_direction, coords.as_tuple())
         b.rotate_z(turbine.yaw_angle - wind_direction, coords.as_tuple())
         plt.plot([a.xprime, b.xprime], [a.yprime, b.yprime], 'k', linewidth=1)

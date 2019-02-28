@@ -14,7 +14,6 @@ specific language governing permissions and limitations under the License.
 import os
 import numpy as np
 import pandas as pd
-from floris.coordinate import Coordinate
 from .types import Output
 from .types import Vec3
 
