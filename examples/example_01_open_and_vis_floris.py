@@ -19,7 +19,7 @@ from wind_farm_controls_tools.types import Vec3
 floris_interface = wfct.floris_utilities.FlorisInterface("example_input.json")
 floris_interface.run_floris()
 
-# Get the FLORIS domain bounds
+# Get the FLORIS domain bounds and define a resolution
 xmin, xmax, ymin, ymax, zmin, zmax = floris_interface.floris.farm.flow_field._get_domain_bounds()
 resolution = Vec3(
     1 + (xmax - xmin) / 10,
@@ -34,5 +34,6 @@ hor_plane = wfct.cut_plane.HorPlane(
 )
 
 # Plot and show
-hor_plane.visualize()
+fig, ax = plt.subplots()
+wfct.visualization.visualize_cut_plane(hor_plane,ax=ax)
 plt.show()
