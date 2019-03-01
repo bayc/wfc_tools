@@ -83,32 +83,7 @@ class _CutPlane():
         self.u_cubed = self.u_mesh ** 3
 
 
-    def visualize(self, ax=None, minSpeed=None, maxSpeed=None):
-        """ Visualize the scan
-        
-        Args:
-            ax: axes for plotting, if none, create a new one  
-            minSpeed, maxSpeed, values used for plotting, if not provide assume to data max min
-        """
-        if not ax:
-            fig, ax = plt.subplots()
-        if minSpeed is None:
-            minSpeed = self.u_mesh.min()
-        if maxSpeed is None:
-            maxSpeed = self.u_mesh.max()
 
-        # Reshape UMesh internally
-        u_mesh = self.u_mesh.reshape(self.resolution[1], self.resolution[0])
-        Zm = np.ma.masked_where(np.isnan(u_mesh), u_mesh)
-
-        # Plot the cut-through
-        im = ax.pcolormesh(self.x1_lin, self.x2_lin, Zm, cmap='coolwarm', vmin=minSpeed, vmax=maxSpeed)
-
-        # Make equal axis
-        ax.set_aspect('equal')
-
-        # Return im
-        return im
 
 
 # Define horizontal subclass
