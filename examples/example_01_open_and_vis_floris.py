@@ -13,11 +13,26 @@
 
 import matplotlib.pyplot as plt
 import wind_farm_controls_tools as wfct
+from wind_farm_controls_tools.types import Vec3
 
+# Initialize and execute FLORIS
 floris_interface = wfct.floris_utilities.FlorisInterface("example_input.json")
 floris_interface.run_floris()
-floris_flow_field = floris_interface.get_flow_field()
 
-hor_plane = wfct.cut_plane.HorPlane(floris_flow_field, 90)
+# Get the FLORIS domain bounds
+xmin, xmax, ymin, ymax, zmin, zmax = floris_interface.floris.farm.flow_field._get_domain_bounds()
+resolution = Vec3(
+    1 + (xmax - xmin) / 10,
+    1 + (ymax - ymin) / 10,
+    1 + (zmax - zmin) / 10
+)
+
+# Initialize the horizontal cut
+hor_plane = wfct.cut_plane.HorPlane(
+    floris_interface.get_flow_field(resolution=resolution),
+    floris_interface.floris.farm.turbines[0].hub_height
+)
+
+# Plot and show
 hor_plane.visualize()
 plt.show()
