@@ -18,7 +18,7 @@ from floris import Floris
 from .flow_field import FlowField
 from .types import Vec3
 
-class FlorisInterface(GenericInterface):
+class FlorisInterface():
     """
     The interface from FLORIS to the wfc tools
     """
@@ -26,18 +26,17 @@ class FlorisInterface(GenericInterface):
     def __init__(self, input_file):
         self.input_file = input_file
         self.floris = Floris(input_file=input_file)
-        flow_field = self.get_flow_field()
-
-        super().__init__(flow_field)
 
     def run_floris(self):
         self.floris.calculate_wake()
 
-    def get_flow_field(self, resolution=None):
+    def get_flow_field(self, resolution):
+        if resolution is None:
+            raise "No resolution given"
+
         flow_field = self.floris.farm.flow_field
-        if resolution is not None:
-            # TODO: flow_field.redo_resolution()
-            pass
+        _, _, _ = flow_field.get_flow_field_with_resolution(resolution)
+        flow_field.calculate_wake()
 
         order = "f"
         x = flow_field.x.flatten(order=order)

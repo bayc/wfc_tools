@@ -22,7 +22,7 @@ import os
 #TODO For now a SOWFA case can only be one where the turbine outputs and the averaged flow field have been saved
 
 
-class SowfaInterface(GenericInterface):
+class SowfaInterface():
     """
     - handle data averaging
     """
@@ -53,8 +53,6 @@ class SowfaInterface(GenericInterface):
         self.layout_x = self.layout_x - flow_field.origin.x1
         self.layout_y = self.layout_y - flow_field.origin.x2
         #TODO HUB-HEIGHT reset with z??
-
-        super().__init__(flow_field)
 
     def import_inputs_and_outputs(self):
 
