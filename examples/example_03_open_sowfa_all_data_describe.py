@@ -11,22 +11,26 @@
 # specific language governing permissions and limitations under the License.
 #
 
+"""
 # EXAMPLE 3
 # In this example, open a SOWFA case including all meta-data
 # Show the data
 # Plot the flow with turbine positions indicated
+"""
 
 import wind_farm_controls_tools as wfct
 import matplotlib.pyplot as plt
 
 # Load the sowfa case
 sowfa_case = wfct.sowfa_utilities.SowfaInterface('sowfa_example')
+
+# Display some info
 print(sowfa_case)
 
 # Plot the flow and turbines using the input information
 fig, ax = plt.subplots()
-flow_field = sowfa_case._flow_field
-hor_plane = wfct.cut_plane.HorPlane(flow_field, 90)
-hor_plane.visualize(ax=ax)
+flow_field = sowfa_case.flow_field
+hor_plane = wfct.cut_plane.HorPlane(sowfa_case.flow_field, 90)
+wfct.visualization.visualize_cut_plane(hor_plane,ax=ax)
 wfct.visualization.plot_turbines(ax, sowfa_case.layout_x, sowfa_case.layout_y, sowfa_case.yaw_angles, sowfa_case.D)
 plt.show()
