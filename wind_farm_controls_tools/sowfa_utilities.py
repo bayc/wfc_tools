@@ -47,11 +47,11 @@ class SowfaInterface():
         self.import_inputs_and_outputs()
 
         # Read the flow field
-        flow_field = self.read_flow_frame_SOWFA(os.path.join(case_folder, flow_field_sub_path))
+        self.flow_field = self.read_flow_frame_SOWFA(os.path.join(case_folder, flow_field_sub_path))
 
         # Re-set turbine positions to flow_field origin
-        self.layout_x = self.layout_x - flow_field.origin.x1
-        self.layout_y = self.layout_y - flow_field.origin.x2
+        self.layout_x = self.layout_x - self.flow_field.origin.x1
+        self.layout_y = self.layout_y - self.flow_field.origin.x2
         #TODO HUB-HEIGHT reset with z??
 
     def import_inputs_and_outputs(self):
