@@ -11,26 +11,30 @@
 # specific language governing permissions and limitations under the License.
 #
 
+""""
 # EXAMPLE 4
 # In this example, open a SOWFA case including all meta-data
 # Open a FLORIS case
 # Adjust FLORIS parameters to match the SOWFA case
 # Plot the two flows with turbine positions indicated
+"""
 
 import wind_farm_controls_tools as wfct
 import wind_farm_controls_tools.visualization as vis
 import wind_farm_controls_tools.cut_plane as cp
+from wind_farm_controls_tools.types import Vec3
 import matplotlib.pyplot as plt
 import numpy as np
+
 
 # Load the SOWFA case in
 sowfa_case = wfct.sowfa_utilities.SowfaInterface('sowfa_example')
 
 # Plot the SOWFA flow and turbines using the input information
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10,2.5))
-sowfa_flow_field = sowfa_case._flow_field
-hor_plane = cp.HorPlane(sowfa_flow_field,90)
-hor_plane.visualize(ax=ax1)
+sowfa_flow_field = sowfa_case.flow_field
+hor_plane = wfct.cut_plane.HorPlane(sowfa_case.flow_field, 90)
+wfct.visualization.visualize_cut_plane(hor_plane,ax=ax1)
 vis.plot_turbines(ax1, sowfa_case.layout_x, sowfa_case.layout_y, sowfa_case.yaw_angles, sowfa_case.D)
 ax1.set_title('SOWFA')
 ax1.set_xlabel('x location [m]')
@@ -44,11 +48,24 @@ floris_interface.floris.farm.set_wind_speed(sowfa_case.precursor_wind_speed, cal
 floris_interface.floris.farm.set_wind_direction(sowfa_case.precursor_wind_dir, calculate_wake=False)
 
 floris_interface.floris.farm.set_turbine_locations(sowfa_case.layout_x, sowfa_case.layout_y, calculate_wake=False)
-floris_interface.floris.farm.set_yaw_angles(sowfa_case.yaw_angles, calculate_wake=False)
+
+#TODO Note a little confusing to enter into radians
+# floris_interface.floris.farm.set_yaw_angles(np.deg2rad(sowfa_case.yaw_angles), calculate_wake=True)
+
+
+# Define a resolution
+#TODO Match SOWFA's resolution
+# Get the FLORIS domain bounds and define a resolution
+xmin, xmax, ymin, ymax, zmin, zmax = floris_interface.floris.farm.flow_field._get_domain_bounds()
+resolution = Vec3(
+    1 + (xmax - xmin) / 10,
+    1 + (ymax - ymin) / 10,
+    1 + (zmax - zmin) / 10
+)
 
 # Generate and get a flow from FLORIS
 floris_interface.run_floris()
-floris_flow_field = floris_interface.get_flow_field()
+floris_flow_field = floris_interface.get_flow_field(resolution=resolution)
 
 # Trim the flow to match SOWFA
 sowfa_domain_limits = [[np.min(sowfa_flow_field.x), np.max(sowfa_flow_field.x)],
@@ -58,8 +75,9 @@ floris_flow_field = floris_flow_field.crop(floris_flow_field, sowfa_domain_limit
 
 # Plot the FLORIS flow and turbines using the input information
 hor_plane = cp.HorPlane(floris_flow_field, 90)
-hor_plane.visualize(ax=ax2)
+wfct.visualization.visualize_cut_plane(hor_plane,ax=ax2)
 vis.plot_turbines(ax2, floris_interface.floris.farm.layout_x, floris_interface.floris.farm.layout_y, floris_interface.get_yaw_angles(), floris_interface.floris.farm.turbine_map.turbines[0].rotor_diameter)
+print(floris_interface.get_yaw_angles())
 ax2.set_title('FLORIS')
 ax2.set_xlabel('x location [m]')
 
