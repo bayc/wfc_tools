@@ -20,65 +20,81 @@
 ## 3) Compare the wake profiles at 3 and 5 D
 
 import wind_farm_controls_tools as wfct
+import wind_farm_controls_tools.visualization as vis
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 # Load SOWFA
 sowfa_case = wfct.sowfa_utilities.SowfaInterface('sowfa_example')
-sowfa_flow_field = sowfa_case._flow_field #TODO Correct?
-print(sowfa_case)
+sowfa_flow_field = sowfa_case.flow_field #TODO Correct?
 
-# Load FLORIS
-#TODO Make match SOWFA (waiting for earlier example to copy from)
+
+# # Load FLORIS
+# #TODO Make match SOWFA (waiting for earlier example to copy from)
 floris_interface = wfct.floris_utilities.FlorisInterface("example_input.json")
+
+# Set the relevant FLORIS parameters to equal the SOWFA case
+floris_interface.floris.farm.set_wind_speed(sowfa_case.precursor_wind_speed, calculate_wake=False)
+floris_interface.floris.farm.set_wind_direction(sowfa_case.precursor_wind_dir, calculate_wake=False)
+floris_interface.floris.farm.set_turbine_locations(sowfa_case.layout_x, sowfa_case.layout_y, calculate_wake=False)
+floris_interface.floris.farm.set_yaw_angles(np.radians(sowfa_case.yaw_angles), calculate_wake=True)
 floris_interface.run_floris()
-floris_flow_field = floris_interface.get_flow_field()
+floris_flow_field = floris_interface.get_flow_field(resolution=sowfa_flow_field.resolution)
+
+# # Confirm the flows compare
+fig, axarr = plt.subplots(2,2)
+ax=axarr[0,0]
+hor_plane = wfct.cut_plane.HorPlane(sowfa_flow_field, 90)
+wfct.visualization.visualize_cut_plane(hor_plane,ax=ax)
+vis.plot_turbines(ax, sowfa_case.layout_x, sowfa_case.layout_y, sowfa_case.yaw_angles, sowfa_case.D)
+ax.set_title('SOWFA')
+ax=axarr[0,1]
+hor_plane = wfct.cut_plane.HorPlane(floris_flow_field, 90)
+wfct.visualization.visualize_cut_plane(hor_plane,ax=ax)
+vis.plot_turbines(ax, floris_interface.floris.farm.layout_x, floris_interface.floris.farm.layout_y, floris_interface.get_yaw_angles(), floris_interface.floris.farm.turbine_map.turbines[0].rotor_diameter)
+ax.set_title('FLORIS')
+
 
 # Grab floris turbine cp/ct tables
 # TODO for now assume only one turbine, is this how to do this?
-for coord, turbine in floris_interface.floris.farm.turbine_map.items():
+# print(floris_interface.floris.farm.turbines)
+for turbine in floris_interface.floris.farm.turbines: # turbine_map.items():
     floris_ws = turbine.power_thrust_table["wind_speed"]
     floris_ct = turbine.power_thrust_table["thrust"]
     floris_cp = turbine.power_thrust_table["power"]
 
 
-# Determine the cut planes distances for 3 and 5 D
-D = sowfa_case.D
+# # Determine the cut planes distances for 7 D
+# D = sowfa_case.D
 
-# Get the 3D values
-sowfa_cut_3 = wfct.cut_plane.CrossPlane(sowfa_flow_field,3 * D + sowfa_case.layout_x[0],y_center=sowfa_case.layout_y[0], z_center=90,D=D)
-x_locs, ws_3 = sowfa_cut_3.get_profile()
-x_locs, pow_3 = sowfa_cut_3.get_power_profile(floris_ws,floris_cp,D/2.)
+# # Get the 5 values
+D = sowfa_case.D 
+sowfa_cross_5 = wfct.cut_plane.CrossPlane(sowfa_flow_field,5 * D + sowfa_case.layout_x[0])
+floris_cross_5 = wfct.cut_plane.CrossPlane(floris_flow_field,5 * D + sowfa_case.layout_x[0])
 
-# Get the 7D values
-sowfa_cut_5 = wfct.cut_plane.CrossPlane(sowfa_flow_field,5 * D + sowfa_case.layout_x[0],y_center=sowfa_case.layout_y[0], z_center=90,D=D)
-x_locs, ws_5 = sowfa_cut_5.get_profile()
-x_locs, pow_5 = sowfa_cut_5.get_power_profile(floris_ws,floris_cp,D/2.)
+# Visuzlie
+ax=axarr[1,0]
+wfct.visualization.visualize_cut_plane(sowfa_cross_5,ax=ax)
+ax=axarr[1,1]
+wfct.visualization.visualize_cut_plane(floris_cross_5,ax=ax)
 
-fig, axarr = plt.subplots(2,2,sharex=True)
+# Map out the power function
+def get_pow(cross_plane,x1_loc):
+    return wfct.cut_plane.calculate_power(cross_plane,x1_loc=x1_loc,x2_loc=90,R=D/2.,ws_array=floris_ws,cp_array=floris_cp)
 
-# Plot the visuals
-sowfa_cut_3.visualize(axarr[0,0])
-sowfa_cut_5.visualize(axarr[0,1])
-axarr[0,0].set_title('3D')
-axarr[0,1].set_title('5D')
+# Now get the profiles in power
+y_points = np.linspace(sowfa_case.layout_x[0]-2*D,sowfa_case.layout_x[0]+2*D,100)
+sowfa_pow = np.array([get_pow(sowfa_cross_5,x) for x in y_points])
+floris_pow = np.array([get_pow(floris_cross_5,x) for x in y_points])
+print(floris_pow)
 
-# Plot the wind-speed profiles
-ax = axarr[1,0]
-ax.plot(x_locs, ws_3,label='SOWFA 3D')
-ax.plot(x_locs, ws_5,label='SOWFA 5D')
-ax.grid()
-ax.set_ylabel('WindSpeed (m/s)')
-ax.set_xlabel('X Location (D)')
+# Compare the profiles
+fig, ax = plt.subplots()
+ax.plot(y_points,sowfa_pow,color='k',label='SOWFA')
+ax.plot(y_points,floris_pow,color='r',label='FLORIS')
+ax.grid(True)
 ax.legend()
-
-# Plot the power profiles
-ax = axarr[1,1]
-ax.plot(x_locs, pow_3/1E6,label='SOWFA 3D')
-ax.plot(x_locs, pow_5/1E6,label='SOWFA 5D')
-ax.grid()
-ax.set_ylabel('Power (MW)')
-ax.set_xlabel('X Location (D)')
-ax.legend()
+wfct.visualization.reverse_cut_plane_x_axis_in_plot(ax)
 
 plt.show()

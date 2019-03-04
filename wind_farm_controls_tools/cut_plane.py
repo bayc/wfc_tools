@@ -102,33 +102,8 @@ class CrossPlane(_CutPlane):
         # Set up call super
         super().__init__(flow_field, x1='y', x2='z', x3_value=x_value)
 
-    def calculate_wind_speed(self, x1_loc, x2_loc, R):
 
-        # Make a distance column
-        distance = np.sqrt((self.x1_flat - x1_loc)**2 +
-                           (self.x2_flat - x2_loc)**2)
 
-        # Return the mean wind speed
-        return np.cbrt(np.mean(self.u_cubed[distance < R]))
-
-    # def get_profile(self, R, x2_loc, resolution=100, x1_locs=None):
-    #     if x1_locs is None:
-    #         x1_locs = np.linspace(
-    #             min(self.x1_flat), max(self.x1_flat), resolution)
-    #     v_array = np.array([self.calculate_wind_speed(
-    #         x1_loc, x2_loc, R) for x1_loc in x1_locs])
-    #     return x1_locs, v_array)
-
-    # def get_power_profile(self, ws_array, cp_array, rotor_radius, air_density=1.225, resolution=100, x1_locs=None):
-
-    #     # Get the wind speed profile
-    #     x1_locs, v_array = self.get_profile(resolution=resolution, x1_locs=x1_locs)
-
-    #     # Get Cp
-    #     cp_array = np.interp(v_array,ws_array,cp_array)
-
-    #     # Return power array
-    #     return x1_locs, 0.5 * air_density * (np.pi * rotor_radius**2) * cp_array * v_array**3
 
 
 
@@ -189,3 +164,42 @@ def rescale_axis(cut_plane,x1_factor=1.0,x2_factor=1.0):
         cut_plane._remesh()
 
         return cut_plane
+
+def calculate_wind_speed(cross_plane, x1_loc, x2_loc, R):
+
+    # Make a distance column
+    distance = np.sqrt((cross_plane.x1_flat - x1_loc)**2 +
+                        (cross_plane.x2_flat - x2_loc)**2)
+
+    # Return the mean wind speed
+    return np.cbrt(np.mean(cross_plane.u_cubed[distance < R]))
+
+def calculate_power(cross_plane, x1_loc, x2_loc, R, ws_array, cp_array,air_density=1.225):
+
+    # Compute the ws
+    ws = calculate_wind_speed(cross_plane, x1_loc, x2_loc, R)
+
+    # Compute the cp
+    cp_value = np.interp(ws,ws_array,cp_array)
+
+    #Return the power
+    return 0.5 * air_density * (np.pi * R**2) * cp_value * ws**3
+
+    # def get_profile(self, R, x2_loc, resolution=100, x1_locs=None):
+    #     if x1_locs is None:
+    #         x1_locs = np.linspace(
+    #             min(self.x1_flat), max(self.x1_flat), resolution)
+    #     v_array = np.array([self.calculate_wind_speed(
+    #         x1_loc, x2_loc, R) for x1_loc in x1_locs])
+    #     return x1_locs, v_array)
+
+    # def get_power_profile(self, ws_array, cp_array, rotor_radius, air_density=1.225, resolution=100, x1_locs=None):
+
+    #     # Get the wind speed profile
+    #     x1_locs, v_array = self.get_profile(resolution=resolution, x1_locs=x1_locs)
+
+    #     # Get Cp
+    #     cp_array = np.interp(v_array,ws_array,cp_array)
+
+    #     # Return power array
+    #     return x1_locs, 0.5 * air_density * (np.pi * rotor_radius**2) * cp_array * v_array**3
