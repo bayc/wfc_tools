@@ -61,5 +61,5 @@ class FlorisInterface():
         return FlowField(x, y, z, u, v, w, spacing=spacing, dimensions=dimensions, origin=origin)
 
     def get_yaw_angles(self):
-        yaw_angles = [np.degrees(turbine.yaw_angle) for turbine in self.floris.farm.turbine_map.turbines]
+        yaw_angles = [turbine.yaw_angle for turbine in self.floris.farm.turbine_map.turbines]
         return yaw_angles
