@@ -60,7 +60,7 @@ floris_flow_field_orig = floris_interface.get_flow_field(resolution=resolution)
 # Plot the original FLORIS flow and turbines using the input information
 hor_plane_orig = cp.HorPlane(floris_flow_field_orig, 90)
 wfct.visualization.visualize_cut_plane(hor_plane_orig,ax=ax1)
-vis.plot_turbines(ax1, floris_interface.floris.farm.layout_x, floris_interface.floris.farm.layout_y, floris_interface.get_yaw_angles(), floris_interface.floris.farm.turbine_map.turbines[0].rotor_diameter)
+vis.plot_turbines(ax1, floris_interface.floris.farm.layout_x, floris_interface.floris.farm.layout_y, np.degrees(floris_interface.get_yaw_angles()), floris_interface.floris.farm.turbine_map.turbines[0].rotor_diameter)
 ax1.set_title('FLORIS - Original')
 ax1.set_ylabel('y location [m]')
 
@@ -68,7 +68,7 @@ ax1.set_ylabel('y location [m]')
 floris_interface.floris.farm.set_wind_speed(sowfa_case.precursor_wind_speed, calculate_wake=False)
 floris_interface.floris.farm.set_wind_direction(sowfa_case.precursor_wind_dir, calculate_wake=False)
 floris_interface.floris.farm.set_turbine_locations(sowfa_case.layout_x, sowfa_case.layout_y, calculate_wake=False)
-floris_interface.floris.farm.set_yaw_angles(sowfa_case.yaw_angles, calculate_wake=True)
+floris_interface.floris.farm.set_yaw_angles(np.radians(sowfa_case.yaw_angles), calculate_wake=False)
 
 # Generate and get a flow from original FLORIS file
 floris_interface.run_floris()
@@ -83,7 +83,7 @@ floris_flow_field_matched = floris_flow_field_matched.crop(floris_flow_field_mat
 # Plot the FLORIS flow and turbines using the input information
 hor_plane_matched = cp.HorPlane(floris_flow_field_matched, 90)
 wfct.visualization.visualize_cut_plane(hor_plane_matched,ax=ax3)
-vis.plot_turbines(ax3, floris_interface.floris.farm.layout_x, floris_interface.floris.farm.layout_y, floris_interface.get_yaw_angles(), floris_interface.floris.farm.turbine_map.turbines[0].rotor_diameter)
+vis.plot_turbines(ax3, floris_interface.floris.farm.layout_x, floris_interface.floris.farm.layout_y, np.degrees(floris_interface.get_yaw_angles()), floris_interface.floris.farm.turbine_map.turbines[0].rotor_diameter)
 ax3.set_title('FLORIS - Matched')
 ax3.set_xlabel('x location [m]')
 ax3.set_ylabel('y location [m]')
