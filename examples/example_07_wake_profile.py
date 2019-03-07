@@ -26,7 +26,10 @@ import numpy as np
 
 
 # Load SOWFA
-sowfa_case = wfct.sowfa_utilities.SowfaInterface('sowfa_example')
+# sowfa_case = wfct.sowfa_utilities.SowfaInterface('sowfa_example')
+# sowfa_case = wfct.sowfa_utilities.SowfaInterface('/Users/pfleming/Box Sync/sowfa_library/full_runs/rated_sowfa/sowfaCases/C_69_5MW_y10_08mps_highTI')
+# sowfa_case = wfct.sowfa_utilities.SowfaInterface('/Users/pfleming/Box Sync/sowfa_library/full_runs/rated_sowfa/sowfaCases/A_71_5MW_y20_08mps_highTI')
+sowfa_case = wfct.sowfa_utilities.SowfaInterface('/Users/pfleming/Box Sync/sowfa_library/full_runs/paper_case/yaw25')
 sowfa_flow_field = sowfa_case.flow_field #TODO Correct?
 
 
@@ -39,6 +42,7 @@ floris_interface.floris.farm.set_wind_speed(sowfa_case.precursor_wind_speed, cal
 floris_interface.floris.farm.set_wind_direction(sowfa_case.precursor_wind_dir, calculate_wake=False)
 floris_interface.floris.farm.set_turbine_locations(sowfa_case.layout_x, sowfa_case.layout_y, calculate_wake=False)
 floris_interface.floris.farm.set_yaw_angles(np.radians(sowfa_case.yaw_angles), calculate_wake=False)
+# floris_interface.floris.farm.set_yaw_angles(np.radians(60), calculate_wake=False)
 floris_interface.run_floris()
 floris_flow_field = floris_interface.get_flow_field(resolution=sowfa_flow_field.resolution)
 
@@ -52,7 +56,7 @@ ax.set_title('SOWFA')
 ax=axarr[0,1]
 hor_plane = wfct.cut_plane.HorPlane(floris_flow_field, 90)
 wfct.visualization.visualize_cut_plane(hor_plane,ax=ax)
-vis.plot_turbines(ax, floris_interface.floris.farm.layout_x, floris_interface.floris.farm.layout_y, floris_interface.get_yaw_angles(), floris_interface.floris.farm.turbine_map.turbines[0].rotor_diameter)
+vis.plot_turbines(ax, floris_interface.floris.farm.layout_x, floris_interface.floris.farm.layout_y, np.degrees(floris_interface.get_yaw_angles()), floris_interface.floris.farm.turbine_map.turbines[0].rotor_diameter)
 ax.set_title('FLORIS')
 
 
@@ -84,10 +88,10 @@ def get_pow(cross_plane,x1_loc):
     return wfct.cut_plane.calculate_power(cross_plane,x1_loc=x1_loc,x2_loc=90,R=D/2.,ws_array=floris_ws,cp_array=floris_cp)
 
 # Now get the profiles in power
-y_points = np.linspace(sowfa_case.layout_x[0]-2*D,sowfa_case.layout_x[0]+2*D,100)
+y_points = np.linspace(sowfa_case.layout_y[0]-3*D,sowfa_case.layout_y[0]+3*D,100)
 sowfa_pow = np.array([get_pow(sowfa_cross_5,x) for x in y_points])
 floris_pow = np.array([get_pow(floris_cross_5,x) for x in y_points])
-print(floris_pow)
+# print(floris_pow)
 
 # Compare the profiles
 fig, ax = plt.subplots()
@@ -95,6 +99,7 @@ ax.plot(y_points,sowfa_pow,color='k',label='SOWFA')
 ax.plot(y_points,floris_pow,color='r',label='FLORIS')
 ax.grid(True)
 ax.legend()
+ax.axvline(sowfa_case.layout_y[0])
 wfct.visualization.reverse_cut_plane_x_axis_in_plot(ax)
 
 plt.show()
