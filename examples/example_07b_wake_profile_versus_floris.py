@@ -18,20 +18,19 @@
 
 import wind_farm_controls_tools as wfct
 import wind_farm_controls_tools.visualization as vis
+from wind_farm_controls_tools.types import Vec3
 import matplotlib.pyplot as plt
 import numpy as np
-from wind_farm_controls_tools.types import Vec3
 
-turbine_1_x = 500.
-turbine_1_y = 500.
-
-# # Load FLORIS
+# Floris setup
+turbine1_x, turbine1_y = 500.0, 500.0
+turbine2_x, turbine2_y = 1200, 500.0
 floris_interface = wfct.floris_utilities.FlorisInterface("example_input.json")
 
-# Set to one turbine and run
-floris_interface.floris.farm.set_turbine_locations([turbine_1_x], [turbine_1_y], calculate_wake=False)
-floris_interface.floris.farm.set_yaw_angles(np.radians([0]), calculate_wake=False)
+# Build the single turbine farm and run
+floris_interface.floris.farm.set_turbine_locations([turbine1_x], [turbine1_y])
 floris_interface.run_floris()
+turbine1 = floris_interface.floris.farm.turbines[0]
 
 # Get the FLORIS domain bounds and define a resolution
 xmin, xmax, ymin, ymax, zmin, zmax = floris_interface.floris.farm.flow_field._get_domain_bounds()
@@ -40,56 +39,62 @@ resolution = Vec3(
     1 + (ymax - ymin) / 10,
     1 + (zmax - zmin) / 10
 )
-
 floris_flow_field = floris_interface.get_flow_field(resolution=resolution)
 
-# # Check flow
+# Visualization the flow field
 fig, ax = plt.subplots()
-hor_plane = wfct.cut_plane.HorPlane(floris_flow_field, 90)
-wfct.visualization.visualize_cut_plane(hor_plane,ax=ax)
-vis.plot_turbines(ax, floris_interface.floris.farm.layout_x, floris_interface.floris.farm.layout_y, np.degrees(floris_interface.get_yaw_angles()), floris_interface.floris.farm.turbine_map.turbines[0].rotor_diameter)
+hor_plane = wfct.cut_plane.HorPlane(floris_flow_field, turbine1.hub_height)
+wfct.visualization.visualize_cut_plane(hor_plane, ax=ax)
+vis.plot_turbines(
+    ax,
+    floris_interface.floris.farm.layout_x,
+    floris_interface.floris.farm.layout_y,
+    np.degrees(floris_interface.get_yaw_angles()),
+    floris_interface.floris.farm.turbine_map.turbines[0].rotor_diameter
+)
 ax.set_title('FLORIS')
 
-
-# Grab floris turbine cp/ct tables
-# TODO for now assume only one turbine, is this how to do this?
-# print(floris_interface.floris.farm.turbines)
-for turbine in floris_interface.floris.farm.turbines: # turbine_map.items():
-    floris_ws = turbine.power_thrust_table["wind_speed"]
-    floris_ct = turbine.power_thrust_table["thrust"]
-    floris_cp = turbine.power_thrust_table["power"]
-
-
 # Use profile method to check power at 1200 m
-second_turbine_x = 1200
-floris_cross = wfct.cut_plane.CrossPlane(floris_flow_field,second_turbine_x)
+floris_cross = wfct.cut_plane.CrossPlane(floris_flow_field, turbine2_x)
 
-# What is the hypothetical power at this point
-D = 126.
-hypothetical_power = wfct.cut_plane.calculate_power(floris_cross,x1_loc=turbine_1_y,x2_loc=90,R=D/2.,ws_array=floris_ws,cp_array=floris_cp)
+# What is the hypothetical power at this point?
+hypothetical_power = wfct.cut_plane.calculate_power(
+    floris_cross,
+    x1_loc=turbine1_y,
+    x2_loc=turbine1.hub_height,
+    R=turbine1.rotor_radius,
+    ws_array=turbine1.power_thrust_table["wind_speed"],
+    cp_array=turbine1.power_thrust_table["power"]
+)
 print('Hypothetical Power = %.2f MW' % (hypothetical_power/1E6))
 
-## What is the power from FLORIS================
-
+# What is the power from FLORIS================
 
 # Add a second turbine
-floris_interface.floris.farm.set_turbine_locations([turbine_1_x,second_turbine_x], [turbine_1_y,turbine_1_y], calculate_wake=False)
-floris_interface.floris.farm.set_yaw_angles(np.radians([0,0]), calculate_wake=False)
+floris_interface.floris.farm.set_turbine_locations(
+    [turbine1_x, turbine2_x],
+    [turbine1_y, turbine1_y],
+    calculate_wake=False
+)
+floris_interface.floris.farm.set_yaw_angles(np.radians(0), calculate_wake=False)
 floris_interface.run_floris()
 
 # Visualize the two turbine case
 floris_flow_field = floris_interface.get_flow_field(resolution=resolution)
 fig, ax = plt.subplots()
-hor_plane = wfct.cut_plane.HorPlane(floris_flow_field, 90)
-wfct.visualization.visualize_cut_plane(hor_plane,ax=ax)
-vis.plot_turbines(ax, floris_interface.floris.farm.layout_x, floris_interface.floris.farm.layout_y, np.degrees(floris_interface.get_yaw_angles()), floris_interface.floris.farm.turbine_map.turbines[0].rotor_diameter)
+hor_plane = wfct.cut_plane.HorPlane(floris_flow_field, turbine1.hub_height)
+wfct.visualization.visualize_cut_plane(hor_plane, ax=ax)
+vis.plot_turbines(
+    ax,
+    floris_interface.floris.farm.layout_x,
+    floris_interface.floris.farm.layout_y,
+    np.degrees(floris_interface.get_yaw_angles()),
+    turbine1.rotor_diameter
+)
 ax.set_title('FLORIS')
 
 # Grab second turbine power
-for turbine in floris_interface.floris.farm.turbines: # turbine_map.items():
-    floris_power = turbine.power
-
-print('FLORIS Power = %.2f MW' % (floris_power/1E6))
-
+turbine2 = floris_interface.floris.farm.turbines[1]
+print('FLORIS Power = %.2f MW' % (turbine2.power/1E6))
 
 plt.show()
