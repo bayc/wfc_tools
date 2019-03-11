@@ -65,8 +65,8 @@ ax1.set_title('FLORIS - Original')
 ax1.set_ylabel('y location [m]')
 
 # Set the relevant FLORIS parameters to equal the SOWFA case
-floris_interface.floris.farm.set_wind_speed(sowfa_case.precursor_wind_speed, calculate_wake=False)
-floris_interface.floris.farm.set_wind_direction(sowfa_case.precursor_wind_dir, calculate_wake=False)
+floris_interface.floris.farm.flow_field.reinitialize_flow_field(wind_speed=sowfa_case.precursor_wind_speed,wind_direction=sowfa_case.precursor_wind_dir)
+
 floris_interface.floris.farm.set_turbine_locations(sowfa_case.layout_x, sowfa_case.layout_y, calculate_wake=False)
 floris_interface.floris.farm.set_yaw_angles(np.radians(sowfa_case.yaw_angles), calculate_wake=False)
 
